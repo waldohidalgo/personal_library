@@ -38,17 +38,19 @@ $(document).ready(function () {
     });
   });
 
-  $("#bookDetail").on("click", "button.addComment", function () {
+  $("#bookDetail").on("submit", "form", function (e) {
+    e.preventDefault();
+
     let newComment =
       "<div class='text-center text-decoration-underline fw-bold'>New Comment: " +
       $("#commentToAdd").val() +
       "</div>";
     $.ajax({
-      url: "/api/books/" + this.id,
+      url: "/api/books/" + $(this).attr("data-id"),
       type: "post",
       dataType: "json",
       data: $("#newCommentForm").serialize(),
-      success: function (data) {
+      success: function () {
         comments.unshift(newComment); //adds new comment to top of list
         $("#detailComments").html(comments.join(""));
         getData(itemsRaw, function (data) {
@@ -84,6 +86,17 @@ $(document).ready(function () {
         getData(itemsRaw, function (response) {
           itemsRaw = response;
         });
+
+        $("#bookDetail").html(`
+          <p
+            id="detailTitle"
+            class="text-center my-0 py-3 fw-bold border border-primary"
+          >
+            Select a book to see it's details and comments below:
+          </p>
+          <ul id="detailComments" class="py-3 mb-0 px-0">
+            <div class="text-center">Comments will go here</div>
+          </ul>`);
       },
     });
   });
@@ -104,18 +117,19 @@ function getComments(id, itemsRaw, cb) {
       comments.push("<li class='ms-5'>" + (i + 1) + "." + val + "</li>");
     });
     comments.push(
-      '<br><form id="newCommentForm"><input type="text" class="form-control" id="commentToAdd" name="comment" placeholder="Add New Comment here"></form>'
+      '<br><form id="newCommentForm" data-id=' +
+        data._id +
+        '><input type="text" class="form-control" id="commentToAdd" name="comment" placeholder="Add New Comment here" required>'
     );
     comments.push(
-      '<br><div class="d-flex justify-content-center gap-2 flex-wrap"><button class="btn btn-success addComment" id="' +
-        data._id +
-        '">Add Comment</button>'
+      '<br><div class="d-flex justify-content-center gap-2 flex-wrap"><button class="btn btn-success addComment" type="submit" ">Add Comment</button>'
     );
     comments.push(
       '<button class="btn btn-danger deleteBook" id="' +
         data._id +
-        '">Delete Book</button></div>'
+        '">Delete Book</button></div></form>'
     );
+
     $("#detailComments").html(comments.join(""));
     cb(comments);
   });

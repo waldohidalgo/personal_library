@@ -44,8 +44,8 @@ module.exports = function (app) {
       let title = req.body.title;
       //response will contain new book object including atleast _id and title
 
-      if (title === undefined || title === "") {
-        res.status(400).send("missing required field title");
+      if (title === undefined) {
+        res.status(200).send("missing required field title");
         return;
       }
 
@@ -56,7 +56,7 @@ module.exports = function (app) {
           { upsert: true, returnDocument: "after" }
         );
 
-        res.status(200).json(book);
+        res.status(200).json({ _id: book._id, title: book.title });
       } catch (error) {
         res.send(error);
       }
@@ -97,7 +97,7 @@ module.exports = function (app) {
           error.message ===
           "input must be a 24 character hex string, 12 byte Uint8Array, or an integer"
         ) {
-          res.status(404).send("no book exists");
+          res.status(200).send("no book exists");
           return;
         }
 
@@ -112,7 +112,7 @@ module.exports = function (app) {
 
       try {
         if (comment === undefined) {
-          res.status(400).send("missing required field comment");
+          res.status(200).send("missing required field comment");
           return;
         }
         const result = await books.findOneAndUpdate(
@@ -129,11 +129,11 @@ module.exports = function (app) {
           error.message ===
           "input must be a 24 character hex string, 12 byte Uint8Array, or an integer"
         ) {
-          res.status(404).send("no book exists");
+          res.status(200).send("no book exists");
           return;
         }
         if (error.message === "no book exists") {
-          res.status(404).send("no book exists");
+          res.status(200).send("no book exists");
           return;
         }
 
@@ -147,7 +147,7 @@ module.exports = function (app) {
 
       try {
         if (bookid === undefined) {
-          res.status(400).send("no book exists");
+          res.status(200).send("no book exists");
           return;
         }
         const result = await books.findOneAndDelete(
@@ -163,11 +163,11 @@ module.exports = function (app) {
           error.message ===
           "input must be a 24 character hex string, 12 byte Uint8Array, or an integer"
         ) {
-          res.status(404).send("no book exists");
+          res.status(200).send("no book exists");
           return;
         }
         if (error.message === "no book exists") {
-          res.status(404).send("no book exists");
+          res.status(200).send("no book exists");
           return;
         }
         res.status(500).send(error.message);

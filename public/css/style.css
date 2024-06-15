@@ -40,7 +40,9 @@ input {
 code {
   background-color: whitesmoke;
 }
-header,
+header {
+  background-color: #eee;
+}
 #sampleui {
   background-color: beige;
 }
